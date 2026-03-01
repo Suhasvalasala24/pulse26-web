@@ -1,75 +1,86 @@
 "use client";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Canvas } from "@react-three/fiber";
+import { MeshDistortMaterial, Sphere } from "@react-three/drei";
+
+function HeatWaveBlob() {
+  return (
+    <Sphere visible args={[1, 100, 200]} scale={2.5}>
+      <MeshDistortMaterial
+        color="#8A1100"
+        attach="material"
+        distort={0.5}
+        speed={1.5}
+        roughness={0.2}
+        metalness={0.8}
+        emissive="#E8420A"
+        emissiveIntensity={0.2}
+      />
+    </Sphere>
+  );
+}
 
 export default function Hero() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const opacityText = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
   return (
-    <section ref={ref} className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-base">
-      
-      {/* Animated Ambient Background Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-fire/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-amber-600/10 rounded-full mix-blend-screen filter blur-[120px] animate-blob animation-delay-2000" />
-      <div className="absolute top-[20%] left-[40%] w-[30vw] h-[30vw] bg-red-900/20 rounded-full mix-blend-screen filter blur-[80px] animate-blob animation-delay-4000" />
+    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#050000]">
+      {/* Three.js Heat Wave Background */}
+      <div className="absolute inset-0 z-0 opacity-40 mix-blend-screen">
+        <Canvas camera={{ position: [0, 0, 5] }}>
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[10, 10, 5]} intensity={1} color="#FFD000" />
+          <HeatWaveBlob />
+        </Canvas>
+      </div>
 
-      {/* Main Content Parallax */}
-      <motion.div style={{ y: yBg, opacity: opacityText }} className="relative z-20 flex flex-col items-center justify-center w-full px-4 text-center">
-        
-        {/* Replace this div with an <img src="/pulse-logo.jpg" /> once you move the image to the public folder */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#050000] via-transparent to-[#050000] z-10" />
+
+      <div className="relative z-20 flex flex-col items-center justify-center w-full px-4 text-center">
+        {/* User's Exact Logo */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="relative w-full max-w-2xl mb-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="relative w-[300px] h-[150px] md:w-[600px] md:h-[300px] mb-8 drop-shadow-[0_0_40px_rgba(255,87,34,0.6)]"
         >
-          {/* PLACEHOLDER FOR LOGO - WE WILL SWAP THIS FOR YOUR ACTUAL IMAGE LATER */}
-          <h1 className="text-7xl md:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-fire-glow via-fire to-fire-deep drop-shadow-[0_0_30px_rgba(232,66,10,0.5)]">
-            PULSE<span className="text-white">'26</span>
-          </h1>
+          <Image 
+            src="/assets/pulse-logo.jpg" 
+            alt="Pulse 26 Official Logo" 
+            fill
+            className="object-contain mix-blend-screen"
+            priority
+          />
         </motion.div>
 
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-2xl md:text-4xl font-bold tracking-[0.4em] uppercase text-white/90 text-glow mb-12"
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="text-2xl md:text-5xl font-['Anton'] tracking-[0.2em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FFD000] mb-12 drop-shadow-[0_0_15px_rgba(232,66,10,0.4)]"
         >
           Feel The Beat
         </motion.h2>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1.2 }}
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="relative px-10 py-4 bg-transparent border border-[#FF5722]/50 text-white font-['Oswald'] tracking-[4px] uppercase overflow-hidden group backdrop-blur-md"
         >
-          <button className="glass-panel px-10 py-5 rounded-full font-bold tracking-widest uppercase overflow-hidden group relative transition-transform hover:scale-105 active:scale-95">
-            <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-              Register Now
-            </span>
-            <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-fire-deep via-fire to-fire-glow opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0" />
-          </button>
-        </motion.div>
-      </motion.div>
+          <span className="relative z-10 group-hover:text-black transition-colors duration-300">
+            Register Now
+          </span>
+          <div className="absolute inset-0 h-full w-full bg-gradient-to-t from-[#8A1100] via-[#FF5722] to-[#FFE600] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out z-0" />
+        </motion.button>
+      </div>
 
-      {/* Funky Background Grid overlay */}
-      <div className="absolute inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4vw_4vw] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_10%,transparent_100%)]" />
-
-      {/* Scroll Indicator */}
+      {/* Smooth Scroll Indicator */}
       <motion.div 
-        animate={{ y: [0, 15, 0], opacity: [0.5, 1, 0.5] }}
+        animate={{ y: [0, 15, 0] }}
         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-        className="absolute bottom-10 z-20 flex flex-col items-center gap-2"
+        className="absolute bottom-10 z-20 flex flex-col items-center gap-3"
       >
-        <span className="text-[10px] tracking-[0.3em] uppercase text-white/40">Scroll</span>
-        <div className="w-[1px] h-12 bg-gradient-to-b from-fire to-transparent" />
+        <div className="w-[1px] h-16 bg-gradient-to-b from-[#E8420A] to-transparent" />
       </motion.div>
     </section>
   );
